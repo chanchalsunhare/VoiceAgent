@@ -6,6 +6,7 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+     "ngrok-skip-browser-warning": "true",
   },
 });
 
@@ -87,8 +88,8 @@ login: async (email, pin) => {
      * Register new user (UPDATED for PIN + Phone)
      * @param {string} username 
      * @param {string} email 
-     * @param {string} pin       // ← Now 4-digit PIN
-     * @param {string} phone     // ← New required field
+     * @param {string} pin      
+     * @param {string} phone     
      * @returns {Promise}
      */
   signup: async (username, email, pin, phone) => {

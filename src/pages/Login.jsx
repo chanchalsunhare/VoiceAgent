@@ -300,11 +300,17 @@ const Login = () => {
   const [showPin, setShowPin] = useState(false);
 
   // Redirect if already logged in
+  const user = useSelector((state) => state.auth.user);
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
+    if (isAuthenticated && user) {
+      const userRole = user.role;
+      if (userRole === 'admin') {
+        navigate('/voiceAgent');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -339,6 +345,7 @@ const Login = () => {
     try {
       // Now sending email + pin
       const response = await authService.login(formData.email, formData.pin);
+      console.log("response",response);
 
       dispatch(
         loginSuccess({
@@ -346,7 +353,15 @@ const Login = () => {
           user: response.user,
         })
       );
-      navigate('/dashboard');
+
+      // Role-based redirection
+      const userRole = response.role;
+      console.log("userRole",userRole);
+      if (userRole === 'admin') {
+        navigate('/voiceagent');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errorMessage = err.message || 'Invalid email or PIN';
       dispatch(loginFailure(errorMessage));

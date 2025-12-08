@@ -37,7 +37,6 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.token = null;
     },
-
     // Signup actions
     signupStart: (state) => {
       state.loading = true;
@@ -74,6 +73,18 @@ const authSlice = createSlice({
       state.successMessage = null;
     },
 
+     setUser: (state, action) => {
+      state.user = action.payload;
+
+      if (action.payload) {
+        // Persist user in localStorage if provided
+        localStorage.setItem("user", JSON.stringify(action.payload));
+      } else {
+        // Remove user from localStorage if null
+        localStorage.removeItem("user");
+      }
+    },
+
     // Initialize auth from localStorage
     initializeAuth: (state) => {
       const token = localStorage.getItem('authToken');
@@ -97,6 +108,7 @@ export const {
   logout,
   clearError,
   clearSuccessMessage,
+  setUser,
   initializeAuth,
 } = authSlice.actions;
 

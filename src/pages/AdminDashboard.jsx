@@ -38,13 +38,13 @@ const AdminDashboard = () => {
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    const handleSave = () => {
-        const updatedUsers = [...users, formData];
-        setUsers(updatedUsers);
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        setFormData({ email: '', username: '', pin: '', phone: '' });
-        setIsAdding(false);
-    };
+        const handleSave = () => {
+            const updatedUsers = [...users, formData];
+            setUsers(updatedUsers);
+            localStorage.setItem('users', JSON.stringify(updatedUsers));
+            setFormData({ email: '', username: '', pin: '', phone: '' });
+            setIsAdding(false);
+        };
 
     const handleEdit = (index) => {
         const user = users[index];

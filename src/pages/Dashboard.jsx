@@ -17,9 +17,11 @@ import {
 import { Logout, Person, Email, DateRange, Security, VolumeUp, BarChart, Settings, Help, Description, ApiSharp } from '@mui/icons-material';
 import Button from '../components/Button';
 import { logout } from '../store/authSlice';
+import authService from '../services/authService';
+import { setUser } from '../store/authSlice';
 
 const Dashboard = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.auth);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -32,9 +34,26 @@ const Dashboard = () => {
     }, 500);
   };
 
-  // Get user data from localStorage if not in Redux
-  const userData = user || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
 
+  useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const response = await authService.getCurrentUser();
+      // dispatch(setUser(response.user)); 
+      dispatch(setUser(response));
+    } catch (error) {
+      console.log('Failed to fetch user:', error);
+    }
+  };
+
+  if (!user) {
+    fetchUser();
+  }
+}, [dispatch, user]);
+
+  // Get user data from localStorage if not in Redux
+  // const userData = user || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
+// const userData = user || localStorage.getItem("user");
   return (
     <Box
       sx={{
@@ -139,7 +158,8 @@ const Dashboard = () => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              {userData?.username || 'User'}
+              {/* {userData?.username || 'User'} */}
+              {user?.username}
             </span>
             !
           </Typography>
@@ -330,7 +350,8 @@ const Dashboard = () => {
                         Username
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700, color: '#1f2937' }}>
-                        {userData?.username || 'N/A'}
+                        {/* {userData?.username || 'N/A'} */}
+                        {user?.username}
                       </Typography>
                     </Box>
                   </Box>
@@ -356,7 +377,8 @@ const Dashboard = () => {
                         Email Address
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700, color: '#1f2937' }}>
-                        {userData?.email || 'N/A'}
+                        {/* {userData?.email || 'N/A'} */}
+                        {user?.email}
                       </Typography>
                     </Box>
                   </Box>
@@ -364,7 +386,7 @@ const Dashboard = () => {
               </Grid>
 
               {/* Quick Actions */}
-              <Grid item xs={12} md={6}>
+              {/* <Grid item xs={12} md={6}>
                 <Paper
                   sx={{
                     background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%)',
@@ -421,13 +443,13 @@ const Dashboard = () => {
                     </MUIButton>
                   </Stack>
                 </Paper>
-              </Grid>
+              </Grid> */}
             </Grid>
           </CardContent>
         </Card>
 
         {/* Features Section */}
-        <Box>
+        {/* <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, marginBottom: 3, color: '#1f2937' }}>
             Available Features
           </Typography>
@@ -485,7 +507,7 @@ const Dashboard = () => {
               </Grid>
             ))}
           </Grid>
-        </Box>
+        </Box> */}
       </Container>
     </Box>
   );
