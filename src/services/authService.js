@@ -127,6 +127,19 @@ login: async (email, pin) => {
       throw error.response?.data || { message: 'Failed to fetch user' };
     }
   },
+  /**
+ * Get all users
+ * @returns {Promise} List of users
+ */
+getAllUsers: async () => {
+  try {
+    const response = await apiClient.get('/admin/users');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch users' };
+  }
+},
+
 };
 
 export default authService;

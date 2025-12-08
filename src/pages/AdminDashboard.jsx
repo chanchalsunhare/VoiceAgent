@@ -18,6 +18,7 @@ import {
     Button,
 } from '@mui/material';
 import { Logout, Security } from '@mui/icons-material';
+import authService from '../services/authService';
 
 
 const AdminDashboard = () => {
@@ -28,23 +29,45 @@ const AdminDashboard = () => {
     const [formData, setFormData] = useState({ email: '', username: '', pin: '', phone: '' });
 
 
-    useEffect(() => {
-        const storedUsers = localStorage.getItem('users');
-        if (storedUsers) setUsers(JSON.parse(storedUsers));
-    }, []);
-
     const handleAddClick = () => setIsAdding(true);
     const handleCloseForm = () => setIsAdding(false);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+const getUsersFromAPI = async () => {
+  try {
+    const res = await authService.getAllUsers();
+    setUsers(res.users || res);   // depends on backend response
+  } catch (error) {
+    alert(error.message || "Failed to load users");
+  }
+};
 
-        const handleSave = () => {
-            const updatedUsers = [...users, formData];
-            setUsers(updatedUsers);
-            localStorage.setItem('users', JSON.stringify(updatedUsers));
-            setFormData({ email: '', username: '', pin: '', phone: '' });
-            setIsAdding(false);
-        };
+
+    useEffect(() => {
+    getUsersFromAPI();
+}, []);
+
+
+const handleSave = async () => {
+  try {
+    const { email, username, pin, phone } = formData;
+
+    await authService.signup(username, email, pin, phone);
+
+    alert("User added successfully!");
+
+    // Refresh users list
+   await getUsersFromAPI();
+
+    setFormData({ email: "", username: "", pin: "", phone: "" });
+    setIsAdding(false);
+  } catch (error) {
+    alert(error.message || "Error adding user");
+  }
+};
+
+
+
 
     const handleEdit = (index) => {
         const user = users[index];
