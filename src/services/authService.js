@@ -127,6 +127,7 @@ login: async (email, pin) => {
       throw error.response?.data || { message: 'Failed to fetch user' };
     }
   },
+
   /**
  * Get all users
  * @returns {Promise} List of users
@@ -137,6 +138,34 @@ getAllUsers: async () => {
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Failed to fetch users' };
+  }
+},
+
+/**
+   * Delete a user (Admin only)
+   * @param {string} userId - The _id of the user to delete
+   * @returns {Promise<void>}
+   */
+  deleteUser: async (userId) => {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    try {
+      await apiClient.delete(`/admin/users/${userId}`);
+
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error.response?.data || { message: 'Failed to delete user' };
+    }
+  },
+
+updateUser: async (id, data) => {
+  try {
+    const res = await apiClient.patch(`/admin/users/${id}`, data);
+    return res.data;
+  } catch (err) {
+    throw err.response?.data || { message: "Update failed" };
   }
 },
 

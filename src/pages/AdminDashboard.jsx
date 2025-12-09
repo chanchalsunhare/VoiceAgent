@@ -1,171 +1,99 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
     Box,
-    AppBar,
-    Toolbar,
-    Typography,
     Container,
-    Button as MUIButton,
-    Card,
-    CardContent,
-    Grid,
-    TextField,
+    Typography,
     Stack,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-} from '@mui/material';
-import { Logout, Security } from '@mui/icons-material';
-import authService from '../services/authService';
+    Button as MUIButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Select,
+    MenuItem,
+    Chip,
+} from "@mui/material";
 
+import authService from "../services/authService";
+import EditUserForm from "../components/EditUserForm";
+import AddUserForm from "../components/AddUserForm";
 
 const AdminDashboard = () => {
-    const [isAdding, setIsAdding] = useState(false);
     const [users, setUsers] = useState([]);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [openAddForm, setOpenAddForm] = useState(false);
+    const [openEditForm, setOpenEditForm] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
-    const [formData, setFormData] = useState({ email: '', username: '', pin: '', phone: '' });
-
-
-    const handleAddClick = () => setIsAdding(true);
-    const handleCloseForm = () => setIsAdding(false);
-
-    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-const getUsersFromAPI = async () => {
-  try {
-    const res = await authService.getAllUsers();
-    setUsers(res.users || res);   // depends on backend response
-  } catch (error) {
-    alert(error.message || "Failed to load users");
-  }
-};
-
+    // Fetch all users
+    const getUsersFromAPI = async () => {
+        try {
+            const res = await authService.getAllUsers();
+            console.log("res", res);
+            setUsers(res.users || res);
+        } catch (err) {
+            alert(err.message || "Failed to load users");
+        }
+    };
 
     useEffect(() => {
-    getUsersFromAPI();
-}, []);
+        getUsersFromAPI();
+    }, []);
 
+    const handleOpenAddForm = () => setOpenAddForm(true);
 
-const handleSave = async () => {
-  try {
-    const { email, username, pin, phone } = formData;
-
-    await authService.signup(username, email, pin, phone);
-
-    alert("User added successfully!");
-
-    // Refresh users list
-   await getUsersFromAPI();
-
-    setFormData({ email: "", username: "", pin: "", phone: "" });
-    setIsAdding(false);
-  } catch (error) {
-    alert(error.message || "Error adding user");
-  }
-};
-
-
-
-
-    const handleEdit = (index) => {
-        const user = users[index];
-        setFormData(user);
-        setIsAdding(true);
-        const updatedUsers = [...users];
-        updatedUsers.splice(index, 1);
-        setUsers(updatedUsers);
-    };
-    const handleLogout = () => {
-        setIsLoggingOut(true);
-        setTimeout(() => {
-            dispatch(logout());
-            navigate('/login');
-        }, 500);
+    const handleOpenEditForm = (user) => {
+        setSelectedUser(user);
+        setOpenEditForm(true);
     };
 
-    const handleView = (user) => {
-        alert(`User Details:\nEmail: ${user.email}\nUsername: ${user.username}\nPIN: ${user.pin}\nPhone: ${user.phone}`);
+    const handleDelete = async (userId, index) => {
+        if (!window.confirm("Are you sure?")) return;
+
+        try {
+            await authService.deleteUser(userId);
+            setUsers((prev) => prev.filter((_, i) => i !== index));
+        } catch (err) {
+            alert(err.message || "Failed to delete user");
+        }
     };
+
+
+    // Status Badge UI
+    const StatusChip = ({ status }) => (
+        <Chip
+            label={status}
+            sx={{
+                backgroundColor: status === "active" ? "#d1fae5" : "#fee2e2",
+                color: status === "active" ? "#065f46" : "#991b1b",
+                fontWeight: 700,
+                textTransform: "capitalize",
+            }}
+        />
+    );
 
     return (
-        <Box sx={{ minHeight: '100vh', background: '#f3f4f6', paddingBottom: 4 }}>
-
-
-
-            <AppBar
-                position="sticky"
-                sx={{
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    color: '#1f2937',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                }}
-            >
-                <Toolbar>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
-                        <Box
-                            sx={{
-                                width: 40,
-                                height: 40,
-                                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-                                borderRadius: 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                            }}
-                        >
-                            <Security sx={{ color: 'white', fontSize: 24 }} />
-                        </Box>
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                fontWeight: 700,
-                                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                            }}
-                        >
-                            VoiceAgent
-                        </Typography>
-                    </Box>
-                    <Button
-                        variant="danger"
-                        size="md"
-                        // onClick={handleLogout}
-                        // loading={isLoggingOut}
-                        // disabled={isLoggingOut}
-                    >
-                        <Logout sx={{ fontSize: 18 }} />
-                        Logout
-                    </Button>
-                </Toolbar>
-            </AppBar>
-
-
-            <Container maxWidth="md" sx={{ marginTop: 4 }}>
-                <Box
+        <Box sx={{ minHeight: "100vh", background: "#f3f4f6", pb: 5 }}>
+            <Container maxWidth="lg">
+                {/* Heading */}
+                {/* <Box
                     sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        py: 3,
                     }}
                 >
-
                     <Typography
-                        variant="h5"
+                        variant="h4"
                         sx={{
                             fontWeight: 800,
-                            fontSize: "1.7rem",
-                            letterSpacing: "0.5px",
-                            background: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
+                            background:
+                                "linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
-                            textShadow: "0px 1px 1px rgba(0,0,0,0.05)",
-                            paddingLeft: 1,
                         }}
                     >
                         Admin Console
@@ -173,159 +101,160 @@ const handleSave = async () => {
 
                     <MUIButton
                         variant="contained"
-                        onClick={handleAddClick}
+                        onClick={handleOpenAddForm}
                         sx={{
-                            background: "linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)",
+                            px: 3,
+                            py: 1,
                             fontWeight: 600,
                             borderRadius: 2,
-                            px: 3,
-                            boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
-                            textTransform: "none",
-                            "&:hover": {
-                                background: "linear-gradient(135deg, #1e40af 0%, #0891b2 100%)",
-                            },
+                            background:
+                                "linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)",
                         }}
                     >
-                        Add User
+                        + Add User
+                    </MUIButton>
+                </Box> */}
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: { xs: "flex-start", md: "center" },
+                        flexDirection: { xs: "column", md: "row" },
+                        gap: { xs: 2, md: 0 },
+                        py: 3,
+                    }}
+                >
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            fontWeight: 800,
+                            background: "linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            textAlign: { xs: "center", md: "left" },
+                            width: { xs: "100%", md: "auto" },
+                        }}
+                    >
+                        Admin Console
+                    </Typography>
+
+                    <MUIButton
+                        variant="contained"
+                        onClick={handleOpenAddForm}
+                        sx={{
+                            px: { xs: 2, md: 3 },
+                            py: 1,
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            width: { xs: "100%", sm: "fit-content" },
+                            background: "linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)",
+                        }}
+                    >
+                        + Add User
                     </MUIButton>
                 </Box>
 
 
+                {/* Responsive Table */}
+                <Paper elevation={3} sx={{ borderRadius: 3, overflow: "hidden" }}>
+                    <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                        <Table>
+                            <TableHead sx={{ background: "#eaecef" }}>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 700 }}>Username</TableCell>
+                                    <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
+                                    <TableCell sx={{ fontWeight: 700 }}>Phone</TableCell>
+                                    <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
 
+                            <TableBody>
+                                {users.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={5} sx={{ textAlign: "center", py: 4 }}>
+                                            No users found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
 
-                <Grid container spacing={2}>
-                    {users.length === 0 && <Typography>No users added yet.</Typography>}
-                    {users.map((user, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
-                            <Card sx={{ borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                                <CardContent>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                        {user.username}
-                                    </Typography>
-                                    <Typography variant="body2">Email: {user.email}</Typography>
-                                    <Typography variant="body2">Phone: {user.phone}</Typography>
-                                    <Typography variant="body2">PIN: {user.pin}</Typography>
-                                    <Stack direction="row" spacing={1} sx={{ marginTop: 2 }}>
-                                        <MUIButton variant="outlined" onClick={() => handleEdit(index)}>
-                                            Edit
-                                        </MUIButton>
-                                        <MUIButton variant="outlined" onClick={() => handleView(user)}>
-                                            Delete
-                                        </MUIButton>
-                                    </Stack>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                                {users.map((user, index) => (
+                                    <TableRow
+                                        key={index}
+                                        sx={{
+                                            "&:nth-of-type(odd)": { backgroundColor: "#f9fafb" },
+                                            "&:hover": { backgroundColor: "#eef2ff", cursor: "pointer" },
+                                        }}
+                                    >
+                                        <TableCell sx={{ fontWeight: 600 }}>
+                                            {user.username}
+                                        </TableCell>
 
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.phone}</TableCell>
 
-                <Dialog
-                    open={isAdding}
-                    onClose={handleCloseForm}
-                    maxWidth="sm"
-                    fullWidth
-                    PaperProps={{
-                        sx: {
-                            borderRadius: 3,
-                            paddingY: 1,
-                            boxShadow: '0px 8px 30px rgba(0,0,0,0.15)',
-                            animation: 'fadeIn 0.3s ease',
-                        },
+                                        {/* Status Dropdown */}
+                                        <TableCell>
+                                            <StatusChip status={user.is_active ? "active" : "inactive"} />
+                                        </TableCell>
+
+                                        {/* Actions */}
+                                        <TableCell>
+                                            <Stack direction="row" spacing={1}>
+                                                <MUIButton
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ borderRadius: 2 }}
+                                                    onClick={() => handleOpenEditForm(user)}
+                                                >
+                                                    Edit
+                                                </MUIButton>
+
+                                                <MUIButton
+                                                    size="small"
+                                                    variant="outlined"
+                                                    color="error"
+                                                    sx={{ borderRadius: 2 }}
+                                                    onClick={() =>
+                                                        handleDelete(user._id || user.id, index)
+                                                    }
+                                                >
+                                                    Delete
+                                                </MUIButton>
+                                            </Stack>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+
+                {/* Add User Form */}
+                <AddUserForm
+                    open={openAddForm}
+                    onClose={() => setOpenAddForm(false)}
+                    onSuccess={getUsersFromAPI}
+                />
+
+                {/* Edit User Form */}
+
+                <EditUserForm
+                    open={openEditForm}
+                    onClose={() => setOpenEditForm(false)}
+                    user={selectedUser}
+                    onSuccess={(updatedUser) => {
+                        setUsers((prevUsers) =>
+                            prevUsers.map((u) =>
+                                (u._id || u.id) === (updatedUser._id || updatedUser.id)
+                                    ? updatedUser
+                                    : u
+                            )
+                        );
+
                     }}
-                >
-                    <DialogTitle
-                        sx={{
-                            fontWeight: 700,
-                            fontSize: '1.4rem',
-                            background: 'linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            textAlign: 'center',
-                            paddingBottom: 0,
-                        }}
-                    >
-                        {formData.username ? 'Edit User' : 'Add New User'}
-                    </DialogTitle>
-
-                    <DialogContent sx={{ mt: 2, pb: 1 }}>
-                        <Stack spacing={2}>
-                            <TextField
-                                label="Email Address"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                fullWidth
-                                variant="outlined"
-                            />
-
-                            <TextField
-                                label="Username"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                fullWidth
-                            />
-
-                            <TextField
-                                label="4-Digit PIN"
-                                name="pin"
-                                type="number"
-                                value={formData.pin}
-                                onChange={handleChange}
-                                fullWidth
-                            />
-
-                            <TextField
-                                label="Phone Number"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                fullWidth
-                            />
-                        </Stack>
-                    </DialogContent>
-
-                    <DialogActions sx={{ padding: 2, justifyContent: 'space-between' }}>
-                        <MUIButton
-                            onClick={handleCloseForm}
-                            sx={{
-                                paddingX: 3,
-                                borderRadius: 2,
-                                fontWeight: 600,
-                                textTransform: 'none',
-                            }}
-                        >
-                            Cancel
-                        </MUIButton>
-
-                        <MUIButton
-                            variant="contained"
-                            onClick={handleSave}
-                            sx={{
-                                paddingX: 4,
-                                borderRadius: 2,
-                                fontWeight: 600,
-                                background: 'linear-gradient(135deg, #2563eb 0%, #06b6d4 100%)',
-                                textTransform: 'none',
-                                boxShadow: '0px 4px 10px rgba(0,0,0,0.15)',
-                            }}
-                        >
-                            Save User
-                        </MUIButton>
-                    </DialogActions>
-
-
-                    <style>
-                        {`
-      @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
-      }
-    `}
-                    </style>
-                </Dialog>
-
+                />
             </Container>
         </Box>
     );

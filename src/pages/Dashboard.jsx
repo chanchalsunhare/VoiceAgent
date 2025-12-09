@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  AppBar,
-  Toolbar,
   Container,
   Grid,
   Card,
@@ -11,49 +9,86 @@ import {
   Typography,
   Box,
   Button as MUIButton,
-  Paper,
   Stack,
 } from '@mui/material';
-import { Logout, Person, Email, DateRange, Security, VolumeUp, BarChart, Settings, Help, Description, ApiSharp } from '@mui/icons-material';
-import Button from '../components/Button';
-import { logout } from '../store/authSlice';
+import { Person, Email, DateRange, Security, VolumeUp, BarChart, Settings, Help, Description, ApiSharp } from '@mui/icons-material';
 import authService from '../services/authService';
 import { setUser } from '../store/authSlice';
 
 const Dashboard = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
-  const { user, token } = useSelector((state) => state.auth);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const user = useSelector((state) => state.auth.user);
 
-  const handleLogout = () => {
-    setIsLoggingOut(true);
-    setTimeout(() => {
-      dispatch(logout());
-      navigate('/login');
-    }, 500);
-  };
+  useEffect(() => {
+    // Prevent multiple script injections
+    if (document.getElementById('elevenlabs-convai-script')) {
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed';
+    script.async = true;
+    script.id = 'elevenlabs-convai-script';
+    script.type = 'text/javascript';
+
+    script.onload = () => {
+      setTimeout(() => {
+        const withdot = document.getElementsByClassName('.bottom-20')
+        const withoutdot = document.getElementsByClassName('bottom-20')
+        const min_min = document.getElementsByClassName('.min-h-min')
+        console.log("withdot", withdot);
+        console.log("withoutdot", withoutdot);
+        console.log("min_min", min_min);
+      }, 5000);
+
+    };
+
+    script.onerror = () => {
+      console.error('Failed to load ElevenLabs widget script');
+    };
+
+    document.body.appendChild(script);
+
+    // Cleanup on unmount
+    return () => {
+      const existingScript = document.getElementById('elevenlabs-convai-script');
+      if (existingScript) {
+        document.body.removeChild(existingScript);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await authService.getCurrentUser();
+        dispatch(setUser(response));
+      } catch (error) {
+        console.log('Failed to fetch user:', error);
+      }
+    };
+
+    if (!user) {
+      fetchUser();
+    }
+  }, [dispatch, user]);
 
 
   useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const response = await authService.getCurrentUser();
-      // dispatch(setUser(response.user)); 
-      dispatch(setUser(response));
-    } catch (error) {
-      console.log('Failed to fetch user:', error);
-    }
-  };
+    const existingScript = document.getElementById("elevenlabs-script");
+    if (existingScript) return;
 
-  if (!user) {
-    fetchUser();
-  }
-}, [dispatch, user]);
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+    script.async = true;
+    script.type = "text/javascript";
+    script.id = "elevenlabs-script";
 
-  // Get user data from localStorage if not in Redux
-  // const userData = user || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
-// const userData = user || localStorage.getItem("user");
+    document.body.appendChild(script);
+  }, []);
+
+
   return (
     <Box
       sx={{
@@ -87,56 +122,21 @@ const Dashboard = () => {
         },
       }}
     >
-      {/* Navigation Header */}
-      <AppBar
-        position="sticky"
+      <Box
         sx={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
-          color: '#1f2937',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          position: 'absolute',
+          top: 20,
         }}
       >
-        <Toolbar>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-                borderRadius: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-              }}
-            >
-              <Security sx={{ color: 'white', fontSize: 24 }} />
-            </Box>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              VoiceAgent
-            </Typography>
-          </Box>
-          <Button
-            variant="danger"
-            size="md"
-            onClick={handleLogout}
-            loading={isLoggingOut}
-            disabled={isLoggingOut}
-          >
-            <Logout sx={{ fontSize: 18 }} />
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
+        <elevenlabs-convai
+          agent-id="agent_4401k9vqkhrwf2er4t3jfk4qm4ge"
+          style={{
+            width: '100%',
+            height: '90vh',
+            marginTop: 'auto',
+          }}
+        />
+      </Box>
 
       {/* Main Content */}
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, paddingTop: 4 }}>
@@ -158,7 +158,7 @@ const Dashboard = () => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              {/* {userData?.username || 'User'} */}
+
               {user?.username}
             </span>
             !
@@ -207,7 +207,9 @@ const Dashboard = () => {
                   </Box>
                 </Box>
                 <Typography variant="h4" sx={{ fontWeight: 700, marginBottom: 1, color: '#1f2937' }}>
-                  Active
+
+                  {user?.is_active ? 'Active' : 'Inactive'}
+
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#9ca3af' }}>
                   Your account is secure and active
@@ -350,7 +352,7 @@ const Dashboard = () => {
                         Username
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700, color: '#1f2937' }}>
-                        {/* {userData?.username || 'N/A'} */}
+
                         {user?.username}
                       </Typography>
                     </Box>
@@ -377,7 +379,7 @@ const Dashboard = () => {
                         Email Address
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700, color: '#1f2937' }}>
-                        {/* {userData?.email || 'N/A'} */}
+
                         {user?.email}
                       </Typography>
                     </Box>
@@ -385,129 +387,9 @@ const Dashboard = () => {
                 </Stack>
               </Grid>
 
-              {/* Quick Actions */}
-              {/* <Grid item xs={12} md={6}>
-                <Paper
-                  sx={{
-                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%)',
-                    padding: 3,
-                    borderRadius: 2,
-                    border: '1px solid rgba(59, 130, 246, 0.1)',
-                  }}
-                >
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600, marginBottom: 2, color: '#1f2937' }}>
-                    Quick Actions
-                  </Typography>
-                  <Stack spacing={1}>
-                    <MUIButton
-                      variant="outlined"
-                      fullWidth
-                      sx={{
-                        color: '#3b82f6',
-                        borderColor: '#3b82f6',
-                        '&:hover': {
-                          backgroundColor: '#eff6ff',
-                          borderColor: '#3b82f6',
-                        },
-                      }}
-                    >
-                      Edit Profile
-                    </MUIButton>
-                    <MUIButton
-                      variant="outlined"
-                      fullWidth
-                      sx={{
-                        color: '#3b82f6',
-                        borderColor: '#3b82f6',
-                        '&:hover': {
-                          backgroundColor: '#eff6ff',
-                          borderColor: '#3b82f6',
-                        },
-                      }}
-                    >
-                      Change Password
-                    </MUIButton>
-                    <MUIButton
-                      variant="outlined"
-                      fullWidth
-                      sx={{
-                        color: '#3b82f6',
-                        borderColor: '#3b82f6',
-                        '&:hover': {
-                          backgroundColor: '#eff6ff',
-                          borderColor: '#3b82f6',
-                        },
-                      }}
-                    >
-                      Security Settings
-                    </MUIButton>
-                  </Stack>
-                </Paper>
-              </Grid> */}
             </Grid>
           </CardContent>
         </Card>
-
-        {/* Features Section */}
-        {/* <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, marginBottom: 3, color: '#1f2937' }}>
-            Available Features
-          </Typography>
-          <Grid container spacing={3}>
-            {[
-              { title: 'Voice Integration', description: 'Connect and manage voice agents', icon: VolumeUp },
-              { title: 'Analytics', description: 'Track performance and metrics', icon: BarChart },
-              { title: 'Settings', description: 'Customize your preferences', icon: Settings },
-              { title: 'Support', description: 'Get help when you need it', icon: Help },
-              { title: 'Documentation', description: 'Learn how to use the platform', icon: Description },
-              { title: 'API Access', description: 'Integrate with your systems', icon: ApiSharp },
-            ].map((feature, index) => (
-              <Grid item xs={12} sm={6} lg={4} key={index}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-                    borderRadius: 2,
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                      borderColor: '#3b82f6',
-                      transform: 'translateY(-4px)',
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        background: 'linear-gradient(135deg, #dbeafe 0%, #cffafe 100%)',
-                        borderRadius: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: 2,
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      <feature.icon sx={{ color: '#3b82f6', fontSize: 24 }} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, marginBottom: 1, color: '#1f2937' }}>
-                      {feature.title}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#6b7280' }}>
-                      {feature.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box> */}
       </Container>
     </Box>
   );

@@ -68,3 +68,8 @@ input:focus {
 button:focus {
   outline: none;
 }
+
+.origin-bottom-right {
+    bottom: 40px !important;
+}
+
