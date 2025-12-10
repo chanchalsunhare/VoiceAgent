@@ -10,6 +10,7 @@ const Input = ({
   disabled = false,
   icon: Icon,
   required = false,
+  
   name = '',
 }) => {
   return (

@@ -32,7 +32,9 @@ const AdminDashboard = () => {
         try {
             const res = await authService.getAllUsers();
             console.log("res", res);
-            setUsers(res.users || res);
+            // setUsers(res.users || res);
+            setUsers((res.users || res).slice().reverse());
+
         } catch (err) {
             alert(err.message || "Failed to load users");
         }
@@ -235,7 +237,11 @@ const AdminDashboard = () => {
                 <AddUserForm
                     open={openAddForm}
                     onClose={() => setOpenAddForm(false)}
-                    onSuccess={getUsersFromAPI}
+                    // onSuccess={getUsersFromAPI}
+                    onSuccess={(newUser) => {
+                        setUsers((prev) => [newUser, ...prev]);   
+                    }}
+
                 />
 
                 {/* Edit User Form */}
