@@ -20,8 +20,17 @@ import {
 import authService from "../services/authService";
 import EditUserForm from "../components/EditUserForm";
 import AddUserForm from "../components/AddUserForm";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
+    const role = localStorage.getItem("role");
+    // console.log(object);
+    const navigate = useNavigate();
+
+    if (role !== "admin") {
+        navigate('/dashboard');
+    }
+
     const [users, setUsers] = useState([]);
     const [openAddForm, setOpenAddForm] = useState(false);
     const [openEditForm, setOpenEditForm] = useState(false);
@@ -239,7 +248,7 @@ const AdminDashboard = () => {
                     onClose={() => setOpenAddForm(false)}
                     // onSuccess={getUsersFromAPI}
                     onSuccess={(newUser) => {
-                        setUsers((prev) => [newUser, ...prev]);   
+                        setUsers((prev) => [newUser, ...prev]);
                     }}
 
                 />

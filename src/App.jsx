@@ -12,7 +12,9 @@ import './App.css';
 
 function App() {
   const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.auth);
+  console.log("user",user);
+  console.log(user?.role === "admin");
 
   useEffect(() => {
     dispatch(initializeAuth());
@@ -42,7 +44,8 @@ function App() {
           path="/voiceagent"
           element={
             <ProtectedRoute>
-              <AdminDashboard />
+             <AdminDashboard />
+               {/* {user?.role === "admin" ? <AdminDashboard /> : <Navigate to="/dashboard" replace />} */}
             </ProtectedRoute>
           }
         />

@@ -14,6 +14,9 @@ import {
 import { Person, Email, DateRange, Security, VolumeUp, BarChart, Settings, Help, Description, ApiSharp } from '@mui/icons-material';
 import authService from '../services/authService';
 import { setUser } from '../store/authSlice';
+import { formatLoginDate } from '../utils/formatLoginDate';
+// import formatLoginDate from '../utils/formatLoginDate';
+
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -87,7 +90,7 @@ const Dashboard = () => {
 
     document.body.appendChild(script);
   }, []);
-
+const loginTime = localStorage.getItem("loginTime");
 
   return (
     <Box
@@ -122,7 +125,7 @@ const Dashboard = () => {
         },
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           top: 20,
@@ -136,7 +139,25 @@ const Dashboard = () => {
             marginTop: 'auto',
           }}
         />
-      </Box>
+      </Box> */}
+      {user?.is_active && (
+  <Box
+    sx={{
+      position: 'absolute',
+      top: 20,
+    }}
+  >
+    <elevenlabs-convai
+      agent-id="agent_4401k9vqkhrwf2er4t3jfk4qm4ge"
+      style={{
+        width: '100%',
+        height: '90vh',
+        marginTop: 'auto',
+      }}
+    />
+  </Box>
+)}
+
 
       {/* Main Content */}
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, paddingTop: 4 }}>
@@ -238,7 +259,7 @@ const Dashboard = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 2 }}>
                   <Typography sx={{ color: '#6b7280', fontWeight: 600 }} variant="body2">
-                    Member Since
+                    Last Login
                   </Typography>
                   <Box
                     sx={{
@@ -255,7 +276,7 @@ const Dashboard = () => {
                   </Box>
                 </Box>
                 <Typography variant="h4" sx={{ fontWeight: 700, marginBottom: 1, color: '#1f2937' }}>
-                  Today
+                 {formatLoginDate(loginTime)}
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#9ca3af' }}>
                   Welcome to our platform

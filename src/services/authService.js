@@ -39,25 +39,7 @@ apiClient.interceptors.response.use(
 
 export const authService = {
 
-  // /**
-  //  * Login user with username and password
-  //  * @param {string} username - User username
-  //  * @param {string} password - User password
-  //  * @returns {Promise} Response with token and user data
-  //  */
-  // login: async (username, password) => {
-  //   try {
-  //     const response = await apiClient.post('/auth/login', {
-  //       username,
-  //       password,
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     throw error.response?.data || { message: 'Login failed' };
-  //   }
-  // },
-
-
+ 
   /**
  * Login user with email and 4-digit PIN
  * @param {string} email - User's registered email address
