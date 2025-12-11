@@ -40,9 +40,7 @@ const Dashboard = () => {
         const withdot = document.getElementsByClassName('.bottom-20')
         const withoutdot = document.getElementsByClassName('bottom-20')
         const min_min = document.getElementsByClassName('.min-h-min')
-        console.log("withdot", withdot);
-        console.log("withoutdot", withoutdot);
-        console.log("min_min", min_min);
+
       }, 5000);
 
     };
@@ -90,7 +88,7 @@ const Dashboard = () => {
 
     document.body.appendChild(script);
   }, []);
-const loginTime = localStorage.getItem("loginTime");
+  const loginTime = localStorage.getItem("loginTime");
 
   return (
     <Box
@@ -141,22 +139,22 @@ const loginTime = localStorage.getItem("loginTime");
         />
       </Box> */}
       {user?.is_active && (
-  <Box
-    sx={{
-      position: 'absolute',
-      top: 20,
-    }}
-  >
-    <elevenlabs-convai
-      agent-id="agent_4401k9vqkhrwf2er4t3jfk4qm4ge"
-      style={{
-        width: '100%',
-        height: '90vh',
-        marginTop: 'auto',
-      }}
-    />
-  </Box>
-)}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 20,
+          }}
+        >
+          <elevenlabs-convai
+            agent-id="agent_4401k9vqkhrwf2er4t3jfk4qm4ge"
+            style={{
+              width: '100%',
+              height: '90vh',
+              marginTop: 'auto',
+            }}
+          />
+        </Box>
+      )}
 
 
       {/* Main Content */}
@@ -276,7 +274,7 @@ const loginTime = localStorage.getItem("loginTime");
                   </Box>
                 </Box>
                 <Typography variant="h4" sx={{ fontWeight: 700, marginBottom: 1, color: '#1f2937' }}>
-                 {formatLoginDate(loginTime)}
+                  {formatLoginDate(loginTime)}
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#9ca3af' }}>
                   Welcome to our platform

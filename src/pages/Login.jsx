@@ -99,7 +99,7 @@ const Login = () => {
 
       // Role-based redirection
       const userRole = response.role;
-      console.log("userRole", userRole);
+      // console.log("userRole", userRole);
       if (userRole === 'admin') {
         navigate('/voiceagent');
       } else {
@@ -110,33 +110,6 @@ const Login = () => {
       dispatch(loginFailure(errorMessage));
       setErrors({ submit: errorMessage });
     }
-
-    //     try {
-    //   const response = await authService.login(formData.email, formData.pin);
-
-    //   localStorage.setItem("loginTime", new Date().toISOString());
-
-    //   dispatch(
-    //     loginSuccess({
-    //       token: response.access_token,
-    //       user: response.user,
-    //     })
-    //   );
-
-    //   // FIXED
-    //   const userRole = response.user?.role;
-
-    //   if (userRole === 'admin') {
-    //     navigate('/voiceagent');
-    //   } else {
-    //     navigate('/dashboard');
-    //   }
-
-    // } catch (err) {
-    //   const errorMessage = err.message || 'Invalid email or PIN';
-    //   dispatch(loginFailure(errorMessage));
-    //   setErrors({ submit: errorMessage }); // optional (for inline form errors)
-    // }
 
   };
 

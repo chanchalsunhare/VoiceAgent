@@ -16,6 +16,7 @@ import {
 import { useState, useEffect } from "react";
 import authService from "../services/authService";
 import validation from "../utils/validation";
+import toast from "react-hot-toast";
 
 const EditUserForm = ({ open, onClose, user, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -84,10 +85,13 @@ const EditUserForm = ({ open, onClose, user, onSuccess }) => {
                 is_active: formData.status === "active",
             });
 
-            alert("User updated!");
+            // alert("User updated!");
+             toast.success('User updated successfully!');
             onClose();
         } catch (err) {
-            alert(err.message || "Error updating user");
+            // alert(err.message || "Error updating user");
+            toast.error(err.detail)
+            console.log("error",err.detail);
         }
     };
 
@@ -98,14 +102,7 @@ const EditUserForm = ({ open, onClose, user, onSuccess }) => {
             <DialogContent>
                 <Stack spacing={2} mt={1}>
                     
-                    <TextField
-                        label="Email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        error={!!errors.email}
-                        helperText={errors.email}
-                    />
+                 
 
                     <TextField
                         label="Username"
@@ -114,6 +111,14 @@ const EditUserForm = ({ open, onClose, user, onSuccess }) => {
                         onChange={handleChange}
                         error={!!errors.username}
                         helperText={errors.username}
+                    />
+                       <TextField
+                        label="Email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        error={!!errors.email}
+                        helperText={errors.email}
                     />
 
                     <TextField

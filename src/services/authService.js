@@ -79,12 +79,14 @@ login: async (email, pin) => {
       const response = await apiClient.post('/auth/register', {
         username,
         email,
-        pin,       // ← send 'pin' instead of 'password'
+        pin,     
         phone,
       });
       return response.data;
     } catch (error) {
-      const msg = error.response?.data?.message || error.response?.data?.error || 'Signup failed';
+      console.log("Error inSignup",error?.response?.data?.detail)
+      // const msg = error.response?.data?.message || error.response?.data?.error || 'Signup failed';
+       const msg = error?.response?.data?.detail ||  error.response?.data?.message || error.response?.data?.error || 'Signup failed';
      throw new Error(msg);
     }
   },

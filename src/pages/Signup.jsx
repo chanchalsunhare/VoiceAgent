@@ -94,7 +94,7 @@ const Signup = () => {
       const response = await authService.signup(
         formData.username,
         formData.email,
-        formData.pin,      // PIN instead of password
+        formData.pin,    
         formData.phone
       );
 

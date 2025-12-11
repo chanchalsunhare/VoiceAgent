@@ -7,11 +7,14 @@ import {
   TextField,
   Stack,
   Button,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
 import authService from "../services/authService";
 import validation from "../utils/validation";
-
+import toast from "react-hot-toast";
 
 const AddUserForm = ({ open, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -23,44 +26,32 @@ const AddUserForm = ({ open, onClose, onSuccess }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [showPin, setShowPin] = useState(false);
+  const [showConfirmPin, setShowConfirmPin] = useState(false);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async () => {
-    // Validate all fields
     const validationErrors = validation.validateSignupForm(formData);
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    // try {
-    //   const { email, username, pin, phone } = formData;
-    //   await authService.signup(username, email, pin, phone);
-
-    //   alert("User added!");
-    //   onSuccess();
-    //   onClose();
-    // } catch (err) {
-    //   alert(err.message || "Error adding user");
-    // }
     try {
-  const { email, username, pin, phone } = formData;
+      const { email, username, pin, phone } = formData;
+      const createdUser = await authService.signup(username, email, pin, phone);
 
-  // Signup call returns the newly created user
-  const createdUser = await authService.signup(username, email, pin, phone);
-
-  alert("User added!");
-
-  // Pass the new user to parent
-  onSuccess(createdUser);
-  onClose();
-} catch (err) {
-  alert(err.message || "Error adding user");
-}
-
+      // alert("User added!");
+       toast.success('User added successfully!');
+      onSuccess(createdUser);
+      onClose();
+    } catch (err) {
+       toast.error(err.message)
+       console.log("userError", err.message);
+      // alert(err.message || "Error adding user");
+    }
   };
 
   return (
@@ -69,7 +60,6 @@ const AddUserForm = ({ open, onClose, onSuccess }) => {
 
       <DialogContent>
         <Stack spacing={2} mt={1}>
-        
           <TextField
             label="Username"
             name="username"
@@ -78,7 +68,8 @@ const AddUserForm = ({ open, onClose, onSuccess }) => {
             error={!!errors.username}
             helperText={errors.username}
           />
-              <TextField
+
+          <TextField
             label="Email"
             name="email"
             value={formData.email}
@@ -87,26 +78,52 @@ const AddUserForm = ({ open, onClose, onSuccess }) => {
             helperText={errors.email}
           />
 
+          {/* PIN Field with eye icon */}
           <TextField
             label="4 Digit PIN"
             name="pin"
-            type="password"
+            type={showPin ? "text" : "password"}
             inputProps={{ maxLength: 4 }}
             value={formData.pin}
             onChange={handleChange}
             error={!!errors.pin}
             helperText={errors.pin}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                   sx={{ color: "#28a745" }}
+                  onClick={() => setShowPin(!showPin)} edge="end">
+                    {showPin ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
+          {/* Confirm PIN Field with eye icon */}
           <TextField
             label="Confirm PIN"
             name="confirmPin"
-            type="password"
+            type={showConfirmPin ? "text" : "password"}
             inputProps={{ maxLength: 4 }}
             value={formData.confirmPin}
             onChange={handleChange}
             error={!!errors.confirmPin}
             helperText={errors.confirmPin}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPin(!showConfirmPin)}
+                     sx={{ color: "#28a745" }}
+                    edge="end"
+                  >
+                    {showConfirmPin ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
@@ -131,3 +148,4 @@ const AddUserForm = ({ open, onClose, onSuccess }) => {
 };
 
 export default AddUserForm;
+

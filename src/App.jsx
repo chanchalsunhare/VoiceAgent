@@ -13,9 +13,7 @@ import './App.css';
 function App() {
   const dispatch = useDispatch();
   const { token, user } = useSelector((state) => state.auth);
-  console.log("user",user);
-  console.log(user?.role === "admin");
-
+ 
   useEffect(() => {
     dispatch(initializeAuth());
   }, [dispatch]);

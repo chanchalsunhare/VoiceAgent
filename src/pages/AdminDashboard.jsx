@@ -24,11 +24,11 @@ import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
     const role = localStorage.getItem("role");
-    // console.log(object);
+
     const navigate = useNavigate();
 
     if (role !== "admin") {
-        navigate('/dashboard');
+       return navigate('/dashboard');
     }
 
     const [users, setUsers] = useState([]);
